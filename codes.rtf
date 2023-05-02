@@ -1,0 +1,646 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2639
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red183\green111\blue179;\red23\green23\blue23;\red70\green137\blue204;
+\red194\green126\blue101;\red202\green202\blue202;\red67\green192\blue160;\red89\green138\blue67;\red212\green214\blue154;
+\red140\green211\blue254;\red167\green197\blue152;\red205\green173\blue106;}
+{\*\expandedcolortbl;;\cssrgb\c77255\c52549\c75294;\cssrgb\c11765\c11765\c11765;\cssrgb\c33725\c61176\c83922;
+\cssrgb\c80784\c56863\c47059;\cssrgb\c83137\c83137\c83137;\cssrgb\c30588\c78824\c69020;\cssrgb\c41569\c60000\c33333;\cssrgb\c86275\c86275\c66667;
+\cssrgb\c61176\c86275\c99608;\cssrgb\c70980\c80784\c65882;\cssrgb\c84314\c72941\c49020;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 //black line\
+\pard\pardeftab720\partightenfactor0
+
+\f1 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 <stdio.h>\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 "opencv2/opencv.hpp"\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 "opencv_aee.hpp"\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 "main.hpp"\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 "pi2c.h"\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 "opencv2/imgproc/imgproc.hpp"\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 <opencv2/imgproc.hpp>\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 "opencv2/highgui.hpp"\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 "iostream"\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 <wiringPiI2C.h>\cf6 \cb1 \strokec6 \
+\
+\cf2 \cb3 \strokec2 using\cf6 \strokec6  \cf4 \strokec4 namespace\cf6 \strokec6  \cf7 \strokec7 cv\cf6 \strokec6 ;\cb1 \
+\cf2 \cb3 \strokec2 using\cf6 \strokec6  \cf4 \strokec4 namespace\cf6 \strokec6  \cf7 \strokec7 std\cf6 \strokec6 ;\cb1 \
+\cf8 \cb3 \strokec8 //blackline\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf9 \strokec9 Linefinding\cf6 \strokec6 (\cf7 \strokec7 Mat\cf6 \strokec6  \cf10 \strokec10 hsvImage\cf6 \strokec6 ,\cf7 \strokec7 Mat\cf4 \strokec4 &\cf6 \strokec6  \cf10 \strokec10 output\cf6 \strokec6 , \cf4 \strokec4 int*\cf6 \strokec6  \cf10 \strokec10 error\cf6 \strokec6 ) \{\cb1 \
+\
+\cf8 \cb3 \strokec8  //Black\cf6 \cb1 \strokec6 \
+\cb3 Mat \cf10 \strokec10 blackMask\cf6 \strokec6 ;\cb1 \
+\cf9 \cb3 \strokec9 inRange\cf6 \strokec6 (\cf10 \strokec10 hsvImage\cf6 \strokec6 , \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 0\cf6 \strokec6 , \cf11 \strokec11 0\cf6 \strokec6 , \cf11 \strokec11 0\cf6 \strokec6 ), \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 179\cf6 \strokec6 , \cf11 \strokec11 255\cf6 \strokec6 , \cf11 \strokec11 1\cf6 \strokec6 ), \cf10 \strokec10 blackMask\cf6 \strokec6 );\cf8 \strokec8  //identifies pixels that are black throught the HSV values\cf6 \cb1 \strokec6 \
+\
+\cf8 \cb3 \strokec8 // Display the counts\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 c1\cf6 \strokec6  = \cf9 \strokec9 countNonZero\cf6 \strokec6 (\cf10 \strokec10 blackMask\cf6 \strokec6 );\cb1 \
+\cf9 \cb3 \strokec9 printf\cf6 \strokec6 (\cf5 \strokec5 "Black: \cf10 \strokec10 %d\cf12 \strokec12 \\n\cf5 \strokec5 "\cf6 \strokec6 , \cf10 \strokec10 c1\cf6 \strokec6 );\cb1 \
+\
+\cf8 \cb3 \strokec8 // Write the counts onto the output image\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 width\cf6 \strokec6  = \cf10 \strokec10 blackMask\cf6 \strokec6 .\cf10 \strokec10 cols\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 height\cf6 \strokec6  = \cf10 \strokec10 blackMask\cf6 \strokec6 .\cf10 \strokec10 rows\cf6 \strokec6 ;\cb1 \
+\cb3 Mat \cf10 \strokec10 countsImg\cf6 \strokec6  = \cf7 \strokec7 Mat\cf6 \strokec6 ::\cf9 \strokec9 zeros\cf6 \strokec6 (\cf10 \strokec10 height\cf6 \strokec6 , \cf10 \strokec10 width\cf6 \strokec6 , CV_8UC1);\cb1 \
+\cf10 \cb3 \strokec10 countsImg\cf6 \strokec6 .\cf9 \strokec9 setTo\cf6 \strokec6 (\cf11 \strokec11 255\cf6 \strokec6 , \cf10 \strokec10 blackMask\cf6 \strokec6 );\cb1 \
+\
+\cf8 \cb3 \strokec8 //create boxes act as sensors\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 col_width\cf6 \strokec6  = \cf10 \strokec10 countsImg\cf6 \strokec6 .\cf10 \strokec10 cols\cf6 \strokec6  / \cf11 \strokec11 6\cf6 \strokec6 ;\cf8 \strokec8  // divide into 6 sections\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 line1_x\cf6 \strokec6  = \cf10 \strokec10 col_width\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 line2_x\cf6 \strokec6  = \cf10 \strokec10 col_width\cf6 \strokec6  * \cf11 \strokec11 2\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 line3_x\cf6 \strokec6  = \cf10 \strokec10 col_width\cf6 \strokec6  * \cf11 \strokec11 3\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 line4_x\cf6 \strokec6  = \cf10 \strokec10 col_width\cf6 \strokec6  * \cf11 \strokec11 4\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 line5_x\cf6 \strokec6  = \cf10 \strokec10 col_width\cf6 \strokec6  * \cf11 \strokec11 5\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 line_y1\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 line_y2\cf6 \strokec6  = \cf10 \strokec10 countsImg\cf6 \strokec6 .\cf10 \strokec10 rows\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 thickness\cf6 \strokec6  = \cf11 \strokec11 1\cf6 \strokec6 ;\cb1 \
+\cf9 \cb3 \strokec9 line\cf6 \strokec6 (\cf10 \strokec10 countsImg\cf6 \strokec6 , \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line1_x\cf6 \strokec6 , \cf10 \strokec10 line_y1\cf6 \strokec6 ), \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line1_x\cf6 \strokec6 , \cf10 \strokec10 line_y2\cf6 \strokec6 ), \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 255\cf6 \strokec6 ), \cf10 \strokec10 thickness\cf6 \strokec6 );\cb1 \
+\cf9 \cb3 \strokec9 line\cf6 \strokec6 (\cf10 \strokec10 countsImg\cf6 \strokec6 , \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line2_x\cf6 \strokec6 , \cf10 \strokec10 line_y1\cf6 \strokec6 ), \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line2_x\cf6 \strokec6 , \cf10 \strokec10 line_y2\cf6 \strokec6 ), \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 255\cf6 \strokec6 ), \cf10 \strokec10 thickness\cf6 \strokec6 );\cb1 \
+\cf9 \cb3 \strokec9 line\cf6 \strokec6 (\cf10 \strokec10 countsImg\cf6 \strokec6 , \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line3_x\cf6 \strokec6 , \cf10 \strokec10 line_y1\cf6 \strokec6 ), \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line3_x\cf6 \strokec6 , \cf10 \strokec10 line_y2\cf6 \strokec6 ), \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 255\cf6 \strokec6 ), \cf10 \strokec10 thickness\cf6 \strokec6 );\cb1 \
+\cf9 \cb3 \strokec9 line\cf6 \strokec6 (\cf10 \strokec10 countsImg\cf6 \strokec6 , \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line4_x\cf6 \strokec6 , \cf10 \strokec10 line_y1\cf6 \strokec6 ), \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line4_x\cf6 \strokec6 , \cf10 \strokec10 line_y2\cf6 \strokec6 ), \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 255\cf6 \strokec6 ), \cf10 \strokec10 thickness\cf6 \strokec6 );\cb1 \
+\cf9 \cb3 \strokec9 line\cf6 \strokec6 (\cf10 \strokec10 countsImg\cf6 \strokec6 , \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line5_x\cf6 \strokec6 , \cf10 \strokec10 line_y1\cf6 \strokec6 ), \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line5_x\cf6 \strokec6 , \cf10 \strokec10 line_y2\cf6 \strokec6 ), \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 255\cf6 \strokec6 ), \cf10 \strokec10 thickness\cf6 \strokec6 );\cb1 \
+\
+\cf8 \cb3 \strokec8 // count white pixels in each box\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 box1\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 box2\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 box3\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 box4\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 box5\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 box6\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cf2 \cb3 \strokec2 for\cf6 \strokec6  (\cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 y\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ; \cf10 \strokec10 y\cf6 \strokec6  < \cf10 \strokec10 countsImg\cf6 \strokec6 .\cf10 \strokec10 rows\cf6 \strokec6 ; \cf10 \strokec10 y\cf6 \strokec6 ++) \{\cb1 \
+\cb3     \cf2 \strokec2 for\cf6 \strokec6  (\cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 x\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ; \cf10 \strokec10 x\cf6 \strokec6  < \cf10 \strokec10 countsImg\cf6 \strokec6 .\cf10 \strokec10 cols\cf6 \strokec6 ; \cf10 \strokec10 x\cf6 \strokec6 ++) \{\cb1 \
+\cb3         \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 countsImg\cf6 \strokec6 .\cf10 \strokec10 at\cf6 \strokec6 <uchar>(\cf10 \strokec10 y\cf6 \strokec6 , \cf10 \strokec10 x\cf6 \strokec6 ) == \cf11 \strokec11 255\cf6 \strokec6 ) \{\cb1 \
+\cb3             \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 x\cf6 \strokec6  <= \cf10 \strokec10 line1_x\cf6 \strokec6  - \cf10 \strokec10 thickness\cf6 \strokec6 ) \{\cb1 \
+\cb3                 \cf10 \strokec10 box1\cf6 \strokec6 ++;\cb1 \
+\cb3             \} \cf2 \strokec2 else\cf6 \strokec6  \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 x\cf6 \strokec6  > \cf10 \strokec10 line1_x\cf6 \strokec6  && \cf10 \strokec10 x\cf6 \strokec6  <= \cf10 \strokec10 line2_x\cf6 \strokec6  - \cf10 \strokec10 thickness\cf6 \strokec6 ) \{\cb1 \
+\cb3                 \cf10 \strokec10 box2\cf6 \strokec6 ++;\cb1 \
+\cb3             \} \cf2 \strokec2 else\cf6 \strokec6  \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 x\cf6 \strokec6  > \cf10 \strokec10 line2_x\cf6 \strokec6  && \cf10 \strokec10 x\cf6 \strokec6  <= \cf10 \strokec10 line3_x\cf6 \strokec6  - \cf10 \strokec10 thickness\cf6 \strokec6 ) \{\cb1 \
+\cb3                 \cf10 \strokec10 box3\cf6 \strokec6 ++;\cb1 \
+\cb3             \} \cf2 \strokec2 else\cf6 \strokec6  \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 x\cf6 \strokec6  > \cf10 \strokec10 line3_x\cf6 \strokec6  && \cf10 \strokec10 x\cf6 \strokec6  <= \cf10 \strokec10 line4_x\cf6 \strokec6  - \cf10 \strokec10 thickness\cf6 \strokec6 ) \{\cb1 \
+\cb3                 \cf10 \strokec10 box4\cf6 \strokec6 ++;\cb1 \
+\cb3             \} \cf2 \strokec2 else\cf6 \strokec6  \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 x\cf6 \strokec6  > \cf10 \strokec10 line4_x\cf6 \strokec6  && \cf10 \strokec10 x\cf6 \strokec6  <= \cf10 \strokec10 line5_x\cf6 \strokec6  - \cf10 \strokec10 thickness\cf6 \strokec6 ) \{\cb1 \
+\cb3                 \cf10 \strokec10 box5\cf6 \strokec6 ++;\cb1 \
+\cb3             \} \cf2 \strokec2 else\cf6 \strokec6  \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 x\cf6 \strokec6  > \cf10 \strokec10 line5_x\cf6 \strokec6  && \cf10 \strokec10 x\cf6 \strokec6  <= \cf10 \strokec10 countsImg\cf6 \strokec6 .\cf10 \strokec10 cols\cf6 \strokec6  - \cf10 \strokec10 thickness\cf6 \strokec6 ) \{\cb1 \
+\cb3                 \cf10 \strokec10 box6\cf6 \strokec6 ++;\cb1 \
+\cb3             \}\cb1 \
+\cb3         \}\cb1 \
+\cb3     \}\cb1 \
+\cb3 \}\cb1 \
+\
+\cf10 \cb3 \strokec10 cout\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf5 \strokec5 "Number of white pixels in height: "\cf6 \strokec6  << \cf10 \strokec10 countsImg\cf6 \strokec6 .\cf10 \strokec10 cols\cf6 \strokec6  << \cf9 \strokec9 endl\cf6 \strokec6 ;\cb1 \
+\cf10 \cb3 \strokec10 cout\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf5 \strokec5 "Number of white pixels in row: "\cf6 \strokec6  <<\cf10 \strokec10 countsImg\cf6 \strokec6 .\cf10 \strokec10 rows\cf6 \strokec6  << \cf9 \strokec9 endl\cf6 \strokec6 ;\cb1 \
+\cf10 \cb3 \strokec10 cout\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf5 \strokec5 "Number of white pixels in box1 : "\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf10 \strokec10 box1\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf9 \strokec9 endl\cf6 \strokec6 ;\cb1 \
+\cf10 \cb3 \strokec10 cout\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf5 \strokec5 "Number of white pixels in box2: "\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf10 \strokec10 box2\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf9 \strokec9 endl\cf6 \strokec6 ;\cb1 \
+\cf10 \cb3 \strokec10 cout\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf5 \strokec5 "Number of white pixels in box3: "\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf10 \strokec10 box3\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf9 \strokec9 endl\cf6 \strokec6 ;\cb1 \
+\cf10 \cb3 \strokec10 cout\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf5 \strokec5 "Number of white pixels in box4: "\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf10 \strokec10 box4\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf9 \strokec9 endl\cf6 \strokec6 ;\cb1 \
+\cf10 \cb3 \strokec10 cout\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf5 \strokec5 "Number of white pixels in box5: "\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf10 \strokec10 box5\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf9 \strokec9 endl\cf6 \strokec6 ;\cb1 \
+\cf10 \cb3 \strokec10 cout\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf5 \strokec5 "Number of white pixels in box6: "\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf10 \strokec10 box6\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf9 \strokec9 endl\cf6 \strokec6 ;\cb1 \
+\
+\
+\cf9 \cb3 \strokec9 imshow\cf6 \strokec6 (\cf5 \strokec5 "Counts"\cf6 \strokec6 , \cf10 \strokec10 countsImg\cf6 \strokec6 );\cb1 \
+\cf8 \cb3 \strokec8 //l1||r1 +l2|| r2+l3||r3\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8 //max pixel count is 1664\cf6 \cb1 \strokec6 \
+\
+\cf8 \cb3 \strokec8 //PID solution to find error value\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 fd\cf6 \strokec6  = \cf9 \strokec9 wiringPiI2CSetup\cf6 \strokec6 (\cf11 \strokec11 0x04\cf6 \strokec6 );\cf8 \strokec8   // address of the Arduino Nano on the I2C bus\cf6 \cb1 \strokec6 \
+\
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 total_pixels\cf6 \strokec6  = \cf10 \strokec10 box1\cf6 \strokec6  + \cf10 \strokec10 box2\cf6 \strokec6  + \cf10 \strokec10 box3\cf6 \strokec6  + \cf10 \strokec10 box4\cf6 \strokec6  + \cf10 \strokec10 box5\cf6 \strokec6  + \cf10 \strokec10 box6\cf6 \strokec6 ;\cb1 \
+\cf8 \cb3 \strokec8 //reference point is the middle of frame with the pixel coordinate of 160\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 num1\cf6 \strokec6  = -\cf11 \strokec11 133.3333\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 num2\cf6 \strokec6  = -\cf11 \strokec11 80.0000\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 num3\cf6 \strokec6  = -\cf11 \strokec11 26.6666\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 num4\cf6 \strokec6  = \cf11 \strokec11 26.6666\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 num5\cf6 \strokec6  = \cf11 \strokec11 80.0000\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 num6\cf6 \strokec6  = \cf11 \strokec11 133.3333\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 weighted_avg\cf6 \strokec6  = ((\cf10 \strokec10 box1\cf6 \strokec6 *\cf10 \strokec10 num1\cf6 \strokec6 )+(\cf10 \strokec10 box2\cf6 \strokec6 *\cf10 \strokec10 num2\cf6 \strokec6 )+(\cf10 \strokec10 box3\cf6 \strokec6 *\cf10 \strokec10 num3\cf6 \strokec6 )+(\cf10 \strokec10 box4\cf6 \strokec6 *\cf10 \strokec10 num4\cf6 \strokec6 )+(\cf10 \strokec10 box5\cf6 \strokec6 *\cf10 \strokec10 num5\cf6 \strokec6 )+(\cf10 \strokec10 box6\cf6 \strokec6 *\cf10 \strokec10 num6\cf6 \strokec6 ))/\cf10 \strokec10 total_pixels\cf6 \strokec6 ;\cb1 \
+\cf8 \cb3 \strokec8 //double weighted_avg = ((box1*-21)+(box2*-12)+(box3*-5)+(box4*5)+(box5* 12)+(box6* 21))/total_pixels;\cf6 \cb1 \strokec6 \
+\cb3 *\cf10 \strokec10 error\cf6 \strokec6  = (\cf10 \strokec10 weighted_avg\cf6 \strokec6 );\cb1 \
+\cf8 \cb3 \strokec8 //max and min is 133.3333/133\cf6 \cb1 \strokec6 \
+\
+\cf8 \cb3 \strokec8 //wiringPiI2CWrite(fd, (int)error);  // send the error variable as an integer\cf6 \cb1 \strokec6 \
+\
+\cb3 \}\cb1 \
+\
+\cf8 \cb3 \strokec8 //Pi2c car(0x22); // Configure the I2C interface to the Car as a global variable\cf6 \cb1 \strokec6 \
+\
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf9 \strokec9 setup\cf6 \strokec6 (\cf4 \strokec4 void\cf6 \strokec6 ) \{\cb1 \
+\cb3     \cf9 \strokec9 setupCamera\cf6 \strokec6 (\cf11 \strokec11 320\cf6 \strokec6 , \cf11 \strokec11 20\cf6 \strokec6 );\cf8 \strokec8   // Enable the camera for OpenCV\cf6 \cb1 \strokec6 \
+\cb3 \}\cb1 \
+\
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf9 \strokec9 main\cf6 \strokec6 (\cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 argc\cf6 \strokec6 , \cf4 \strokec4 char**\cf6 \strokec6  \cf10 \strokec10 argv\cf6 \strokec6 ) \{\cb1 \
+\cb3     \cf9 \strokec9 setup\cf6 \strokec6 ();\cf8 \strokec8     // Call a setup function to prepare IO and devices\cf6 \cb1 \strokec6 \
+\
+\cb3     \cf9 \strokec9 namedWindow\cf6 \strokec6 (\cf5 \strokec5 "Photo"\cf6 \strokec6 );\cf8 \strokec8    // Create a GUI window called photo\cf6 \cb1 \strokec6 \
+\
+\cb3     \cf2 \strokec2 while\cf6 \strokec6 (\cf4 \strokec4 true\cf6 \strokec6 ) \{\cf8 \strokec8     // Main loop to perform image processing\cf6 \cb1 \strokec6 \
+\cb3         Mat \cf10 \strokec10 frame\cf6 \strokec6 ;\cb1 \
+\
+\cb3         \cf2 \strokec2 while\cf6 \strokec6 (\cf10 \strokec10 frame\cf6 \strokec6 .\cf9 \strokec9 empty\cf6 \strokec6 ()) \{\cb1 \
+\cb3             \cf10 \strokec10 frame\cf6 \strokec6  = \cf9 \strokec9 captureFrame\cf6 \strokec6 ();\cf8 \strokec8  // Capture a frame from the camera and store in a new matrix variable\cf6 \cb1 \strokec6 \
+\cb3         \}\cb1 \
+\
+\cf8 \cb3 \strokec8         // Rotate the frame by 180 degrees\cf6 \cb1 \strokec6 \
+\cb3         \cf9 \strokec9 rotate\cf6 \strokec6 (\cf10 \strokec10 frame\cf6 \strokec6 , \cf10 \strokec10 frame\cf6 \strokec6 , \cf7 \strokec7 cv\cf6 \strokec6 ::ROTATE_180);\cb1 \
+\cf8 \cb3 \strokec8         // Apply bilateral filter to the image to reduce noise while preserving edges\cf6 \cb1 \strokec6 \
+\cb3         Mat \cf10 \strokec10 bblurred\cf6 \strokec6 ;\cb1 \
+\cb3         \cf7 \strokec7 cv\cf6 \strokec6 ::\cf9 \strokec9 bilateralFilter\cf6 \strokec6 (\cf10 \strokec10 frame\cf6 \strokec6 , \cf10 \strokec10 bblurred\cf6 \strokec6 , \cf11 \strokec11 10\cf6 \strokec6 , \cf11 \strokec11 20\cf6 \strokec6 , \cf11 \strokec11 10\cf6 \strokec6 );\cb1 \
+\cf8 \cb3 \strokec8         // Convert the image from BGR to HSV format\cf6 \cb1 \strokec6 \
+\cb3         Mat \cf10 \strokec10 hsvImage\cf6 \strokec6 ;\cb1 \
+\cb3         \cf9 \strokec9 cvtColor\cf6 \strokec6 (\cf10 \strokec10 bblurred\cf6 \strokec6 , \cf10 \strokec10 hsvImage\cf6 \strokec6 , COLOR_BGR2HSV);\cb1 \
+\
+\cb3         Mat \cf10 \strokec10 output\cf6 \strokec6 ;\cb1 \
+\cb3         \cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 error\cf6 \strokec6 ;\cb1 \
+\cb3         \cf9 \strokec9 Linefinding\cf6 \strokec6 (\cf10 \strokec10 hsvImage\cf6 \strokec6 ,\cf10 \strokec10 output\cf6 \strokec6 , &\cf10 \strokec10 error\cf6 \strokec6 );\cb1 \
+\cb3         \cf10 \strokec10 cout\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf5 \strokec5 "Error: "\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf10 \strokec10 error\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf9 \strokec9 endl\cf6 \strokec6 ;\cb1 \
+\
+\cb3         Pi2c \cf10 \strokec10 arduino\cf6 \strokec6 (\cf11 \strokec11 4\cf6 \strokec6 );\cf8 \strokec8  //Create a new object "arduino" using address "0x04"\cf6 \cb1 \strokec6 \
+\cb3         \cf10 \strokec10 arduino\cf6 \strokec6 .\cf9 \strokec9 i2cWriteArduinoInt\cf6 \strokec6 (\cf10 \strokec10 error\cf6 \strokec6 );\cf8 \strokec8  //send error value to Arudino Nano\cf6 \cb1 \strokec6 \
+\
+\cb3         \cf7 \strokec7 cv\cf6 \strokec6 ::\cf9 \strokec9 imshow\cf6 \strokec6 (\cf5 \strokec5 "Photo"\cf6 \strokec6 , \cf10 \strokec10 frame\cf6 \strokec6 );\cf8 \strokec8  // Display the image in the window\cf6 \cb1 \strokec6 \
+\
+\cb3         \cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 key\cf6 \strokec6  = \cf7 \strokec7 cv\cf6 \strokec6 ::\cf9 \strokec9 waitKey\cf6 \strokec6 (\cf11 \strokec11 1\cf6 \strokec6 );\cf8 \strokec8  // Wait 1ms for a keypress (required to update windows)\cf6 \cb1 \strokec6 \
+\
+\cb3         \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 key\cf6 \strokec6  == \cf11 \strokec11 27\cf6 \strokec6 ) \{\cf8 \strokec8  // Check if the ESC key has been pressed\cf6 \cb1 \strokec6 \
+\cb3             \cf2 \strokec2 break\cf6 \strokec6 ;\cb1 \
+\cb3         \}\cb1 \
+\cb3     \}\cb1 \
+\cb3     \cf9 \strokec9 closeCV\cf6 \strokec6 ();\cf8 \strokec8  // Disable the camera and close any windows\cf6 \cb1 \strokec6 \
+\cb3     \cf2 \strokec2 return\cf6 \strokec6  \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cb3 \}\cb1 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0 \cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 \
+//Coloured line\
+\pard\pardeftab720\partightenfactor0
+
+\f1 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 <stdio.h>\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 "opencv2/opencv.hpp"\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 "opencv_aee.hpp"\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 "main.hpp"\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 "pi2c.h"\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 "opencv2/imgproc/imgproc.hpp"\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 "opencv2/highgui.hpp"\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 "iostream"\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 <wiringPiI2C.h>\cf6 \cb1 \strokec6 \
+\
+\cf2 \cb3 \strokec2 using\cf6 \strokec6  \cf4 \strokec4 namespace\cf6 \strokec6  \cf7 \strokec7 cv\cf6 \strokec6 ;\cb1 \
+\cf2 \cb3 \strokec2 using\cf6 \strokec6  \cf4 \strokec4 namespace\cf6 \strokec6  \cf7 \strokec7 std\cf6 \strokec6 ;\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf9 \strokec9 Linefinding\cf6 \strokec6 (\cf7 \strokec7 Mat\cf6 \strokec6  \cf10 \strokec10 hsvImage\cf6 \strokec6 ,\cf7 \strokec7 Mat\cf4 \strokec4 &\cf6 \strokec6  \cf10 \strokec10 output\cf6 \strokec6 , \cf4 \strokec4 int*\cf6 \strokec6  \cf10 \strokec10 error\cf6 \strokec6 ) \{\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8     //RED\cf6 \cb1 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3     Mat \cf10 \strokec10 redMask\cf6 \strokec6 ;\cb1 \
+\cb3     \cf9 \strokec9 inRange\cf6 \strokec6 (\cf10 \strokec10 hsvImage\cf6 \strokec6 , \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 160\cf6 \strokec6 , \cf11 \strokec11 35\cf6 \strokec6 , \cf11 \strokec11 40\cf6 \strokec6 ), \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 185\cf6 \strokec6 , \cf11 \strokec11 245\cf6 \strokec6 , \cf11 \strokec11 245\cf6 \strokec6 ), \cf10 \strokec10 redMask\cf6 \strokec6 );\cb1 \
+\cb3     \cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 c1\cf6 \strokec6  = \cf9 \strokec9 countNonZero\cf6 \strokec6 (\cf10 \strokec10 redMask\cf6 \strokec6 );\cb1 \
+\cb3     \cf9 \strokec9 threshold\cf6 \strokec6 (\cf10 \strokec10 redMask\cf6 \strokec6 , \cf10 \strokec10 redMask\cf6 \strokec6 , \cf11 \strokec11 1\cf6 \strokec6 , \cf11 \strokec11 255\cf6 \strokec6 , THRESH_BINARY);\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8     //Green\cf6 \cb1 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3     Mat \cf10 \strokec10 greenMask\cf6 \strokec6 ;\cb1 \
+\cb3     \cf9 \strokec9 inRange\cf6 \strokec6 (\cf10 \strokec10 hsvImage\cf6 \strokec6 , \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 75\cf6 \strokec6 , \cf11 \strokec11 55\cf6 \strokec6 , \cf11 \strokec11 40\cf6 \strokec6 ), \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 95\cf6 \strokec6 , \cf11 \strokec11 255\cf6 \strokec6 , \cf11 \strokec11 255\cf6 \strokec6 ), \cf10 \strokec10 greenMask\cf6 \strokec6 );\cb1 \
+\cb3     \cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 c2\cf6 \strokec6  = \cf9 \strokec9 countNonZero\cf6 \strokec6 (\cf10 \strokec10 greenMask\cf6 \strokec6 );\cb1 \
+\cb3     \cf9 \strokec9 threshold\cf6 \strokec6 (\cf10 \strokec10 greenMask\cf6 \strokec6 , \cf10 \strokec10 greenMask\cf6 \strokec6 , \cf11 \strokec11 1\cf6 \strokec6 , \cf11 \strokec11 255\cf6 \strokec6 , THRESH_BINARY);\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8     //Blue\cf6 \cb1 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3     Mat \cf10 \strokec10 blueMask\cf6 \strokec6 ;\cb1 \
+\cb3     \cf9 \strokec9 inRange\cf6 \strokec6 (\cf10 \strokec10 hsvImage\cf6 \strokec6 , \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 97\cf6 \strokec6 , \cf11 \strokec11 40\cf6 \strokec6 , \cf11 \strokec11 23\cf6 \strokec6 ), \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 120\cf6 \strokec6 , \cf11 \strokec11 255\cf6 \strokec6 , \cf11 \strokec11 250\cf6 \strokec6 ), \cf10 \strokec10 blueMask\cf6 \strokec6 );\cb1 \
+\cb3     \cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 c3\cf6 \strokec6  = \cf9 \strokec9 countNonZero\cf6 \strokec6 (\cf10 \strokec10 blueMask\cf6 \strokec6 );\cb1 \
+\cb3     \cf9 \strokec9 threshold\cf6 \strokec6 (\cf10 \strokec10 blueMask\cf6 \strokec6 , \cf10 \strokec10 blueMask\cf6 \strokec6 , \cf11 \strokec11 1\cf6 \strokec6 , \cf11 \strokec11 255\cf6 \strokec6 , THRESH_BINARY);\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8     //Yellow\cf6 \cb1 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3     Mat \cf10 \strokec10 yellowMask\cf6 \strokec6 ;\cb1 \
+\cb3     \cf9 \strokec9 inRange\cf6 \strokec6 (\cf10 \strokec10 hsvImage\cf6 \strokec6 , \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 20\cf6 \strokec6 , \cf11 \strokec11 100\cf6 \strokec6 , \cf11 \strokec11 50\cf6 \strokec6 ), \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 40\cf6 \strokec6 , \cf11 \strokec11 255\cf6 \strokec6 , \cf11 \strokec11 255\cf6 \strokec6 ), \cf10 \strokec10 yellowMask\cf6 \strokec6 );\cb1 \
+\cb3     \cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 c4\cf6 \strokec6  = \cf9 \strokec9 countNonZero\cf6 \strokec6 (\cf10 \strokec10 yellowMask\cf6 \strokec6 );\cb1 \
+\cb3     \cf9 \strokec9 threshold\cf6 \strokec6 (\cf10 \strokec10 yellowMask\cf6 \strokec6 , \cf10 \strokec10 yellowMask\cf6 \strokec6 , \cf11 \strokec11 1\cf6 \strokec6 , \cf11 \strokec11 255\cf6 \strokec6 , THRESH_BINARY);\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8     //Black\cf6 \cb1 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3     Mat \cf10 \strokec10 blackMask\cf6 \strokec6 ;\cb1 \
+\cb3     \cf9 \strokec9 inRange\cf6 \strokec6 (\cf10 \strokec10 hsvImage\cf6 \strokec6 , \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 0\cf6 \strokec6 , \cf11 \strokec11 0\cf6 \strokec6 , \cf11 \strokec11 0\cf6 \strokec6 ), \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 360\cf6 \strokec6 , \cf11 \strokec11 150\cf6 \strokec6 , \cf11 \strokec11 100\cf6 \strokec6 ), \cf10 \strokec10 blackMask\cf6 \strokec6 );\cb1 \
+\cb3     \cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 c5\cf6 \strokec6  = \cf9 \strokec9 countNonZero\cf6 \strokec6 (\cf10 \strokec10 blackMask\cf6 \strokec6 );\cb1 \
+\cb3     \cf9 \strokec9 threshold\cf6 \strokec6 (\cf10 \strokec10 blackMask\cf6 \strokec6 , \cf10 \strokec10 blackMask\cf6 \strokec6 , \cf11 \strokec11 1\cf6 \strokec6 , \cf11 \strokec11 255\cf6 \strokec6 , THRESH_BINARY);\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8     //Pink\cf6 \cb1 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3     Mat \cf10 \strokec10 pinkMask\cf6 \strokec6 ;\cb1 \
+\cb3     \cf9 \strokec9 inRange\cf6 \strokec6 (\cf10 \strokec10 hsvImage\cf6 \strokec6 , \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 128\cf6 \strokec6 , \cf11 \strokec11 0\cf6 \strokec6 , \cf11 \strokec11 128\cf6 \strokec6 ), \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 218\cf6 \strokec6 , \cf11 \strokec11 112\cf6 \strokec6 ,\cf11 \strokec11 214\cf6 \strokec6 ), \cf10 \strokec10 pinkMask\cf6 \strokec6 );\cb1 \
+\cb3     \cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 c6\cf6 \strokec6  = \cf9 \strokec9 countNonZero\cf6 \strokec6 (\cf10 \strokec10 pinkMask\cf6 \strokec6 );\cb1 \
+\cb3     \cf9 \strokec9 threshold\cf6 \strokec6 (\cf10 \strokec10 pinkMask\cf6 \strokec6 , \cf10 \strokec10 pinkMask\cf6 \strokec6 , \cf11 \strokec11 1\cf6 \strokec6 , \cf11 \strokec11 255\cf6 \strokec6 , THRESH_BINARY);\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 // Display the counts\cf6 \cb1 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf9 \cb3 \strokec9 printf\cf6 \strokec6 (\cf5 \strokec5 "Red: \cf10 \strokec10 %d\cf12 \strokec12 \\n\cf5 \strokec5 Green: \cf10 \strokec10 %d\cf12 \strokec12 \\n\cf5 \strokec5 Blue: \cf10 \strokec10 %d\cf12 \strokec12 \\n\cf5 \strokec5 Yellow: \cf10 \strokec10 %d\cf12 \strokec12 \\n\cf5 \strokec5 Black: \cf10 \strokec10 %d\cf12 \strokec12 \\n\cf5 \strokec5 Pink: \cf10 \strokec10 %d\cf12 \strokec12 \\n\cf5 \strokec5 "\cf6 \strokec6 , \cf10 \strokec10 c1\cf6 \strokec6 , \cf10 \strokec10 c2\cf6 \strokec6 , \cf10 \strokec10 c3\cf6 \strokec6 , \cf10 \strokec10 c4\cf6 \strokec6 , \cf10 \strokec10 c5\cf6 \strokec6 , \cf10 \strokec10 c6\cf6 \strokec6 );\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 // Find the color with the maximum count\cf6 \cb1 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 maxCount\cf6 \strokec6  = \cf7 \strokec7 std\cf6 \strokec6 ::\cf9 \strokec9 max\cf6 \strokec6 (\{\cf10 \strokec10 c1\cf6 \strokec6 , \cf10 \strokec10 c2\cf6 \strokec6 , \cf10 \strokec10 c3\cf6 \strokec6 , \cf10 \strokec10 c4\cf6 \strokec6 , \cf10 \strokec10 c5\cf6 \strokec6 \});\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 // Combine the masks of the most dominant color\cf6 \cb1 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3 Mat \cf10 \strokec10 dominantMask\cf6 \strokec6 ;\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 maxCount\cf6 \strokec6  == \cf10 \strokec10 c1\cf6 \strokec6 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3     \cf10 \strokec10 dominantMask\cf6 \strokec6  = \cf10 \strokec10 redMask\cf6 \strokec6 ;\cb1 \
+\cb3 \} \cf2 \strokec2 else\cf6 \strokec6  \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 maxCount\cf6 \strokec6  == \cf10 \strokec10 c2\cf6 \strokec6 ) \{\cb1 \
+\cb3     \cf10 \strokec10 dominantMask\cf6 \strokec6  = \cf10 \strokec10 greenMask\cf6 \strokec6 ;\cb1 \
+\cb3 \} \cf2 \strokec2 else\cf6 \strokec6  \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 maxCount\cf6 \strokec6  == \cf10 \strokec10 c3\cf6 \strokec6 ) \{\cb1 \
+\cb3     \cf10 \strokec10 dominantMask\cf6 \strokec6  = \cf10 \strokec10 blueMask\cf6 \strokec6 ;\cb1 \
+\cb3 \} \cf2 \strokec2 else\cf6 \strokec6  \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 maxCount\cf6 \strokec6  == \cf10 \strokec10 c4\cf6 \strokec6 ) \{\cb1 \
+\cb3     \cf10 \strokec10 dominantMask\cf6 \strokec6  = \cf10 \strokec10 yellowMask\cf6 \strokec6 ;\cb1 \
+\cb3 \} \cf2 \strokec2 else\cf6 \strokec6  \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 maxCount\cf6 \strokec6  == \cf10 \strokec10 c5\cf6 \strokec6 ) \{\cb1 \
+\cb3     \cf10 \strokec10 dominantMask\cf6 \strokec6  = \cf10 \strokec10 blackMask\cf6 \strokec6 ;\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 // Write the counts onto the output image\cf6 \cb1 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 width\cf6 \strokec6  = \cf10 \strokec10 dominantMask\cf6 \strokec6 .\cf10 \strokec10 cols\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 height\cf6 \strokec6  = \cf10 \strokec10 dominantMask\cf6 \strokec6 .\cf10 \strokec10 rows\cf6 \strokec6 ;\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3 Mat \cf10 \strokec10 countsImg\cf6 \strokec6  = \cf7 \strokec7 Mat\cf6 \strokec6 ::\cf9 \strokec9 zeros\cf6 \strokec6 (\cf10 \strokec10 height\cf6 \strokec6 , \cf10 \strokec10 width\cf6 \strokec6 , CV_8UC1);\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10 countsImg\cf6 \strokec6 .\cf9 \strokec9 setTo\cf6 \strokec6 (\cf11 \strokec11 255\cf6 \strokec6 , \cf10 \strokec10 dominantMask\cf6 \strokec6 );\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 //create boxes act as sensors\cf6 \cb1 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 col_width\cf6 \strokec6  = \cf10 \strokec10 countsImg\cf6 \strokec6 .\cf10 \strokec10 cols\cf6 \strokec6  / \cf11 \strokec11 6\cf6 \strokec6 ;\cf8 \strokec8  // divide into 6 sections\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 line1_x\cf6 \strokec6  = \cf10 \strokec10 col_width\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 line2_x\cf6 \strokec6  = \cf10 \strokec10 col_width\cf6 \strokec6  * \cf11 \strokec11 2\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 line3_x\cf6 \strokec6  = \cf10 \strokec10 col_width\cf6 \strokec6  * \cf11 \strokec11 3\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 line4_x\cf6 \strokec6  = \cf10 \strokec10 col_width\cf6 \strokec6  * \cf11 \strokec11 4\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 line5_x\cf6 \strokec6  = \cf10 \strokec10 col_width\cf6 \strokec6  * \cf11 \strokec11 5\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 line_y1\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 line_y2\cf6 \strokec6  = \cf10 \strokec10 countsImg\cf6 \strokec6 .\cf10 \strokec10 rows\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 thickness\cf6 \strokec6  = \cf11 \strokec11 1\cf6 \strokec6 ;\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf9 \cb3 \strokec9 line\cf6 \strokec6 (\cf10 \strokec10 countsImg\cf6 \strokec6 , \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line1_x\cf6 \strokec6 , \cf10 \strokec10 line_y1\cf6 \strokec6 ), \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line1_x\cf6 \strokec6 , \cf10 \strokec10 line_y2\cf6 \strokec6 ), \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 255\cf6 \strokec6 ), \cf10 \strokec10 thickness\cf6 \strokec6 );\cb1 \
+\cf9 \cb3 \strokec9 line\cf6 \strokec6 (\cf10 \strokec10 countsImg\cf6 \strokec6 , \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line2_x\cf6 \strokec6 , \cf10 \strokec10 line_y1\cf6 \strokec6 ), \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line2_x\cf6 \strokec6 , \cf10 \strokec10 line_y2\cf6 \strokec6 ), \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 255\cf6 \strokec6 ), \cf10 \strokec10 thickness\cf6 \strokec6 );\cb1 \
+\cf9 \cb3 \strokec9 line\cf6 \strokec6 (\cf10 \strokec10 countsImg\cf6 \strokec6 , \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line3_x\cf6 \strokec6 , \cf10 \strokec10 line_y1\cf6 \strokec6 ), \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line3_x\cf6 \strokec6 , \cf10 \strokec10 line_y2\cf6 \strokec6 ), \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 255\cf6 \strokec6 ), \cf10 \strokec10 thickness\cf6 \strokec6 );\cb1 \
+\cf9 \cb3 \strokec9 line\cf6 \strokec6 (\cf10 \strokec10 countsImg\cf6 \strokec6 , \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line4_x\cf6 \strokec6 , \cf10 \strokec10 line_y1\cf6 \strokec6 ), \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line4_x\cf6 \strokec6 , \cf10 \strokec10 line_y2\cf6 \strokec6 ), \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 255\cf6 \strokec6 ), \cf10 \strokec10 thickness\cf6 \strokec6 );\cb1 \
+\cf9 \cb3 \strokec9 line\cf6 \strokec6 (\cf10 \strokec10 countsImg\cf6 \strokec6 , \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line5_x\cf6 \strokec6 , \cf10 \strokec10 line_y1\cf6 \strokec6 ), \cf9 \strokec9 Point\cf6 \strokec6 (\cf10 \strokec10 line5_x\cf6 \strokec6 , \cf10 \strokec10 line_y2\cf6 \strokec6 ), \cf9 \strokec9 Scalar\cf6 \strokec6 (\cf11 \strokec11 255\cf6 \strokec6 ), \cf10 \strokec10 thickness\cf6 \strokec6 );\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 // count white pixels in each box\cf6 \cb1 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 box1\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 box2\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 box3\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 box4\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 box5\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 box6\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 for\cf6 \strokec6  (\cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 y\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ; \cf10 \strokec10 y\cf6 \strokec6  < \cf10 \strokec10 countsImg\cf6 \strokec6 .\cf10 \strokec10 rows\cf6 \strokec6 ; \cf10 \strokec10 y\cf6 \strokec6 ++) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3     \cf2 \strokec2 for\cf6 \strokec6  (\cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 x\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ; \cf10 \strokec10 x\cf6 \strokec6  < \cf10 \strokec10 countsImg\cf6 \strokec6 .\cf10 \strokec10 cols\cf6 \strokec6 ; \cf10 \strokec10 x\cf6 \strokec6 ++) \{\cb1 \
+\cb3         \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 countsImg\cf6 \strokec6 .\cf10 \strokec10 at\cf6 \strokec6 <uchar>(\cf10 \strokec10 y\cf6 \strokec6 , \cf10 \strokec10 x\cf6 \strokec6 ) == \cf11 \strokec11 255\cf6 \strokec6 ) \{\cb1 \
+\cb3             \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 x\cf6 \strokec6  <= \cf10 \strokec10 line1_x\cf6 \strokec6  - \cf10 \strokec10 thickness\cf6 \strokec6 ) \{\cb1 \
+\cb3                 \cf10 \strokec10 box1\cf6 \strokec6 ++;\cb1 \
+\cb3             \} \cf2 \strokec2 else\cf6 \strokec6  \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 x\cf6 \strokec6  > \cf10 \strokec10 line1_x\cf6 \strokec6  && \cf10 \strokec10 x\cf6 \strokec6  <= \cf10 \strokec10 line2_x\cf6 \strokec6  - \cf10 \strokec10 thickness\cf6 \strokec6 ) \{\cb1 \
+\cb3                 \cf10 \strokec10 box2\cf6 \strokec6 ++;\cb1 \
+\cb3             \} \cf2 \strokec2 else\cf6 \strokec6  \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 x\cf6 \strokec6  > \cf10 \strokec10 line2_x\cf6 \strokec6  && \cf10 \strokec10 x\cf6 \strokec6  <= \cf10 \strokec10 line3_x\cf6 \strokec6  - \cf10 \strokec10 thickness\cf6 \strokec6 ) \{\cb1 \
+\cb3                 \cf10 \strokec10 box3\cf6 \strokec6 ++;\cb1 \
+\cb3             \} \cf2 \strokec2 else\cf6 \strokec6  \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 x\cf6 \strokec6  > \cf10 \strokec10 line3_x\cf6 \strokec6  && \cf10 \strokec10 x\cf6 \strokec6  <= \cf10 \strokec10 line4_x\cf6 \strokec6  - \cf10 \strokec10 thickness\cf6 \strokec6 ) \{\cb1 \
+\cb3                 \cf10 \strokec10 box4\cf6 \strokec6 ++;\cb1 \
+\cb3             \} \cf2 \strokec2 else\cf6 \strokec6  \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 x\cf6 \strokec6  > \cf10 \strokec10 line4_x\cf6 \strokec6  && \cf10 \strokec10 x\cf6 \strokec6  <= \cf10 \strokec10 line5_x\cf6 \strokec6  - \cf10 \strokec10 thickness\cf6 \strokec6 ) \{\cb1 \
+\cb3                 \cf10 \strokec10 box5\cf6 \strokec6 ++;\cb1 \
+\cb3             \} \cf2 \strokec2 else\cf6 \strokec6  \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 x\cf6 \strokec6  > \cf10 \strokec10 line5_x\cf6 \strokec6  && \cf10 \strokec10 x\cf6 \strokec6  <= \cf10 \strokec10 countsImg\cf6 \strokec6 .\cf10 \strokec10 cols\cf6 \strokec6  - \cf10 \strokec10 thickness\cf6 \strokec6 ) \{\cb1 \
+\cb3                 \cf10 \strokec10 box6\cf6 \strokec6 ++;\cb1 \
+\cb3             \}\cb1 \
+\cb3         \}\cb1 \
+\cb3     \}\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10 cout\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf5 \strokec5 "Number of white pixels in height: "\cf6 \strokec6  << \cf10 \strokec10 countsImg\cf6 \strokec6 .\cf10 \strokec10 cols\cf6 \strokec6  << \cf9 \strokec9 endl\cf6 \strokec6 ;\cb1 \
+\cf10 \cb3 \strokec10 cout\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf5 \strokec5 "Number of white pixels in row: "\cf6 \strokec6  <<\cf10 \strokec10 countsImg\cf6 \strokec6 .\cf10 \strokec10 rows\cf6 \strokec6  << \cf9 \strokec9 endl\cf6 \strokec6 ;\cb1 \
+\cf10 \cb3 \strokec10 cout\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf5 \strokec5 "Number of white pixels in box1 : "\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf10 \strokec10 box1\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf9 \strokec9 endl\cf6 \strokec6 ;\cb1 \
+\cf10 \cb3 \strokec10 cout\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf5 \strokec5 "Number of white pixels in box2: "\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf10 \strokec10 box2\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf9 \strokec9 endl\cf6 \strokec6 ;\cb1 \
+\cf10 \cb3 \strokec10 cout\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf5 \strokec5 "Number of white pixels in box3: "\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf10 \strokec10 box3\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf9 \strokec9 endl\cf6 \strokec6 ;\cb1 \
+\cf10 \cb3 \strokec10 cout\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf5 \strokec5 "Number of white pixels in box4: "\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf10 \strokec10 box4\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf9 \strokec9 endl\cf6 \strokec6 ;\cb1 \
+\cf10 \cb3 \strokec10 cout\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf5 \strokec5 "Number of white pixels in box5: "\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf10 \strokec10 box5\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf9 \strokec9 endl\cf6 \strokec6 ;\cb1 \
+\cf10 \cb3 \strokec10 cout\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf5 \strokec5 "Number of white pixels in box6: "\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf10 \strokec10 box6\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf9 \strokec9 endl\cf6 \strokec6 ;\cb1 \
+\
+\
+\pard\pardeftab720\partightenfactor0
+\cf9 \cb3 \strokec9 imshow\cf6 \strokec6 (\cf5 \strokec5 "Counts"\cf6 \strokec6 , \cf10 \strokec10 countsImg\cf6 \strokec6 );\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 //l1||r1 +l2|| r2+l3||r3\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8 //max pixel count is 1664\cf6 \cb1 \strokec6 \
+\
+\cf8 \cb3 \strokec8 //PID solution to find error value\cf6 \cb1 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 fd\cf6 \strokec6  = \cf9 \strokec9 wiringPiI2CSetup\cf6 \strokec6 (\cf11 \strokec11 0x04\cf6 \strokec6 );\cf8 \strokec8   // address of the Arduino Nano on the I2C bus\cf6 \cb1 \strokec6 \
+\
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 total_pixels\cf6 \strokec6  = \cf10 \strokec10 box1\cf6 \strokec6  + \cf10 \strokec10 box2\cf6 \strokec6  + \cf10 \strokec10 box3\cf6 \strokec6  + \cf10 \strokec10 box4\cf6 \strokec6  + \cf10 \strokec10 box5\cf6 \strokec6  + \cf10 \strokec10 box6\cf6 \strokec6 ;\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 //reference point is the middle of frame with the pixel coordinate of 160\cf6 \cb1 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 num1\cf6 \strokec6  = -\cf11 \strokec11 133.3333\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 num2\cf6 \strokec6  = -\cf11 \strokec11 80.0000\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 num3\cf6 \strokec6  = -\cf11 \strokec11 26.6666\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 num4\cf6 \strokec6  = \cf11 \strokec11 26.6666\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 num5\cf6 \strokec6  = \cf11 \strokec11 80.0000\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 num6\cf6 \strokec6  = \cf11 \strokec11 133.3333\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 weighted_avg\cf6 \strokec6  = ((\cf10 \strokec10 box1\cf6 \strokec6 *\cf10 \strokec10 num1\cf6 \strokec6 )+(\cf10 \strokec10 box2\cf6 \strokec6 *\cf10 \strokec10 num2\cf6 \strokec6 )+(\cf10 \strokec10 box3\cf6 \strokec6 *\cf10 \strokec10 num3\cf6 \strokec6 )+(\cf10 \strokec10 box4\cf6 \strokec6 *\cf10 \strokec10 num4\cf6 \strokec6 )+(\cf10 \strokec10 box5\cf6 \strokec6 *\cf10 \strokec10 num5\cf6 \strokec6 )+(\cf10 \strokec10 box6\cf6 \strokec6 *\cf10 \strokec10 num6\cf6 \strokec6 ))/\cf10 \strokec10 total_pixels\cf6 \strokec6 ;\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 //double weighted_avg = ((box1*-21)+(box2*-12)+(box3*-5)+(box4*5)+(box5* 12)+(box6* 21))/total_pixels;\cf6 \cb1 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3 *\cf10 \strokec10 error\cf6 \strokec6  = (\cf10 \strokec10 weighted_avg\cf6 \strokec6 );\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 //max and min is 133.3333/133\cf6 \cb1 \strokec6 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 //Pi2c car(0x22); // Configure the I2C interface to the Car as a global variable\cf6 \cb1 \strokec6 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf9 \strokec9 setup\cf6 \strokec6 (\cf4 \strokec4 void\cf6 \strokec6 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3     \cf9 \strokec9 setupCamera\cf6 \strokec6 (\cf11 \strokec11 320\cf6 \strokec6 , \cf11 \strokec11 20\cf6 \strokec6 );\cf8 \strokec8   // Enable the camera for OpenCV\cf6 \cb1 \strokec6 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf9 \strokec9 main\cf6 \strokec6 (\cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 argc\cf6 \strokec6 , \cf4 \strokec4 char**\cf6 \strokec6  \cf10 \strokec10 argv\cf6 \strokec6 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3     \cf9 \strokec9 setup\cf6 \strokec6 ();\cf8 \strokec8     // Call a setup function to prepare IO and devices\cf6 \cb1 \strokec6 \
+\
+\cb3     \cf9 \strokec9 namedWindow\cf6 \strokec6 (\cf5 \strokec5 "Photo"\cf6 \strokec6 );\cf8 \strokec8    // Create a GUI window called photo\cf6 \cb1 \strokec6 \
+\
+\cb3     \cf2 \strokec2 while\cf6 \strokec6 (\cf4 \strokec4 true\cf6 \strokec6 ) \{\cf8 \strokec8     // Main loop to perform image processing\cf6 \cb1 \strokec6 \
+\cb3         Mat \cf10 \strokec10 frame\cf6 \strokec6 ;\cb1 \
+\
+\cb3         \cf2 \strokec2 while\cf6 \strokec6 (\cf10 \strokec10 frame\cf6 \strokec6 .\cf9 \strokec9 empty\cf6 \strokec6 ()) \{\cb1 \
+\cb3             \cf10 \strokec10 frame\cf6 \strokec6  = \cf9 \strokec9 captureFrame\cf6 \strokec6 ();\cf8 \strokec8  // Capture a frame from the camera and store in a new matrix variable\cf6 \cb1 \strokec6 \
+\cb3         \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8         // Rotate the frame by 180 degrees\cf6 \cb1 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3         \cf9 \strokec9 rotate\cf6 \strokec6 (\cf10 \strokec10 frame\cf6 \strokec6 , \cf10 \strokec10 frame\cf6 \strokec6 , \cf7 \strokec7 cv\cf6 \strokec6 ::ROTATE_180);\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8         // Apply bilateral filter to the image to reduce noise while preserving edges\cf6 \cb1 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3         Mat \cf10 \strokec10 bblurred\cf6 \strokec6 ;\cb1 \
+\cb3         \cf7 \strokec7 cv\cf6 \strokec6 ::\cf9 \strokec9 bilateralFilter\cf6 \strokec6 (\cf10 \strokec10 frame\cf6 \strokec6 , \cf10 \strokec10 bblurred\cf6 \strokec6 , \cf11 \strokec11 10\cf6 \strokec6 , \cf11 \strokec11 20\cf6 \strokec6 , \cf11 \strokec11 10\cf6 \strokec6 );\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8         // Convert the image from BGR to HSV format\cf6 \cb1 \strokec6 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3         Mat \cf10 \strokec10 hsvImage\cf6 \strokec6 ;\cb1 \
+\cb3         \cf9 \strokec9 cvtColor\cf6 \strokec6 (\cf10 \strokec10 bblurred\cf6 \strokec6 , \cf10 \strokec10 hsvImage\cf6 \strokec6 , COLOR_BGR2HSV);\cb1 \
+\cb3         Mat \cf10 \strokec10 output\cf6 \strokec6 ;\cb1 \
+\cb3         \cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 error\cf6 \strokec6 ;\cb1 \
+\cb3         \cf9 \strokec9 Linefinding\cf6 \strokec6 (\cf10 \strokec10 hsvImage\cf6 \strokec6 ,\cf10 \strokec10 output\cf6 \strokec6 , &\cf10 \strokec10 error\cf6 \strokec6 );\cb1 \
+\cb3         \cf10 \strokec10 cout\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf5 \strokec5 "Error: "\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf10 \strokec10 error\cf6 \strokec6  \cf9 \strokec9 <<\cf6 \strokec6  \cf9 \strokec9 endl\cf6 \strokec6 ;\cb1 \
+\
+\cb3         Pi2c \cf10 \strokec10 arduino\cf6 \strokec6 (\cf11 \strokec11 4\cf6 \strokec6 );\cf8 \strokec8  //Create a new object "arduino" using address "0x04"\cf6 \cb1 \strokec6 \
+\cb3         \cf10 \strokec10 arduino\cf6 \strokec6 .\cf9 \strokec9 i2cWriteArduinoInt\cf6 \strokec6 (\cf10 \strokec10 error\cf6 \strokec6 );\cf8 \strokec8  //send error value to Arudino Nano\cf6 \cb1 \strokec6 \
+\
+\cb3         \cf7 \strokec7 cv\cf6 \strokec6 ::\cf9 \strokec9 imshow\cf6 \strokec6 (\cf5 \strokec5 "Photo"\cf6 \strokec6 , \cf10 \strokec10 frame\cf6 \strokec6 );\cf8 \strokec8  // Display the image in the window\cf6 \cb1 \strokec6 \
+\
+\cb3         \cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 key\cf6 \strokec6  = \cf7 \strokec7 cv\cf6 \strokec6 ::\cf9 \strokec9 waitKey\cf6 \strokec6 (\cf11 \strokec11 1\cf6 \strokec6 );\cf8 \strokec8  // Wait 1ms for a keypress (required to update windows)\cf6 \cb1 \strokec6 \
+\
+\cb3         \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 key\cf6 \strokec6  == \cf11 \strokec11 27\cf6 \strokec6 ) \{\cf8 \strokec8  // Check if the ESC key has been pressed\cf6 \cb1 \strokec6 \
+\cb3             \cf2 \strokec2 break\cf6 \strokec6 ;\cb1 \
+\cb3         \}\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf9 \strokec9 closeCV\cf6 \strokec6 ();\cf8 \strokec8  // Disable the camera and close any windows\cf6 \cb1 \strokec6 \
+\cb3     \cf2 \strokec2 return\cf6 \strokec6  \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cb3 \}\
+\
+//nano code\
+\pard\pardeftab720\partightenfactor0
+\cf2 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 <Wire.h>\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #define\cf4 \strokec4  I2C_SLAVE_ADDR \cf11 \strokec11 0x04\cf8 \strokec8  // 4 in hexadecimal\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 <Servo.h>\cf4 \strokec4     \cf8 \strokec8 //include the servo library\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #define\cf4 \strokec4  servoPin \cf11 \strokec11 4\cf6 \cb1 \strokec6 \
+\cb3 Servo \cf10 \strokec10 myservo\cf6 \strokec6 ;\cf8 \strokec8         // create servo object to control a servo\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 float\cf6 \strokec6  \cf10 \strokec10 steeringAngle\cf6 \strokec6 ;\cf8 \strokec8   // variable to store the servo position\cf6 \cb1 \strokec6 \
+\
+\cf2 \cb3 \strokec2 #define\cf4 \strokec4  enA \cf11 \strokec11 5\cf8 \strokec8    //EnableA command line - should be a PWM pin\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #define\cf4 \strokec4  enB \cf11 \strokec11 6\cf8 \strokec8    //EnableB command line - should be a PWM pin\cf6 \cb1 \strokec6 \
+\
+\cf8 \cb3 \strokec8 //name the motor control pins - replace the CHANGEME with your pin number, digital pins do not need the 'D' prefix whereas analogue pins need the 'A' prefix\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #define\cf4 \strokec4  INa A0\cf8 \strokec8   //Channel A direction \cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #define\cf4 \strokec4  INb A1\cf8 \strokec8   //Channel A direction \cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #define\cf4 \strokec4  INc A2\cf8 \strokec8   //Channel B direction \cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #define\cf4 \strokec4  INd A3\cf8 \strokec8   //Channel B direction \cf6 \cb1 \strokec6 \
+\
+\cf7 \cb3 \strokec7 byte\cf6 \strokec6  \cf10 \strokec10 speedSetting\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cf8 \strokec8   //initial speed = 0\cf6 \cb1 \strokec6 \
+\
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 leftMotor_speed\cf6 \strokec6  = \cf11 \strokec11 255\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 rightMotor_speed\cf6 \strokec6  = \cf11 \strokec11 255\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 baseSpeed\cf6 \strokec6  = \cf11 \strokec11 255\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 servoAngle\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 centreAngle\cf6 \strokec6  = \cf11 \strokec11 85\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 Kp\cf6 \strokec6  = \cf11 \strokec11 0.5\cf6 \strokec6  ;\cb1 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 Kd\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 Ki\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6  ;\cb1 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 K\cf6 \strokec6  = \cf11 \strokec11 0.5\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 error\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 cumulative_error\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cf4 \cb3 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 prev_error\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf9 \strokec9 setup\cf6 \strokec6 () \{\cb1 \
+\cf8 \cb3 \strokec8   //initialise serial communication\cf6 \cb1 \strokec6 \
+\cb3   \cf10 \strokec10 Serial\cf6 \strokec6 .\cf9 \strokec9 println\cf6 \strokec6 (\cf5 \strokec5 "Arduino Nano is Running"\cf6 \strokec6 );\cf8 \strokec8  //sanity check\cf6 \cb1 \strokec6 \
+\cb3   \cf10 \strokec10 Serial\cf6 \strokec6 .\cf9 \strokec9 begin\cf6 \strokec6 (\cf11 \strokec11 9600\cf6 \strokec6 );\cf8 \strokec8 // open the serial port at 9600 bps:\cf6 \cb1 \strokec6 \
+\cb3   \cf10 \strokec10 Wire\cf6 \strokec6 .\cf9 \strokec9 begin\cf6 \strokec6 (\cf11 \strokec11 0x04\cf6 \strokec6 );\cf8 \strokec8  //Set Arduino up as an I2C slave at address 0x07\cf6 \cb1 \strokec6 \
+\cb3   \cb1 \
+\cb3   \cf10 \strokec10 myservo\cf6 \strokec6 .\cf9 \strokec9 attach\cf6 \strokec6 (\cf4 \strokec4 servoPin\cf6 \strokec6 );\cf8 \strokec8   //attach our servo object to pin D4\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   //the Servo library takes care of defining the PinMode declaration (libraries/Servo/src/avr/Servo.cpp line 240)\cf6 \cb1 \strokec6 \
+\
+\cf8 \cb3 \strokec8   //configure the motor control pins as outputs\cf6 \cb1 \strokec6 \
+\cb3   \cf9 \strokec9 pinMode\cf6 \strokec6 (\cf4 \strokec4 INa\cf6 \strokec6 , OUTPUT);\cb1 \
+\cb3   \cf9 \strokec9 pinMode\cf6 \strokec6 (\cf4 \strokec4 INb\cf6 \strokec6 , OUTPUT);\cb1 \
+\cb3   \cf9 \strokec9 pinMode\cf6 \strokec6 (\cf4 \strokec4 INc\cf6 \strokec6 , OUTPUT);\cb1 \
+\cb3   \cf9 \strokec9 pinMode\cf6 \strokec6 (\cf4 \strokec4 INd\cf6 \strokec6 , OUTPUT);\cb1 \
+\cb3   \cf9 \strokec9 pinMode\cf6 \strokec6 (\cf4 \strokec4 enA\cf6 \strokec6 , OUTPUT);\cb1 \
+\cb3   \cf9 \strokec9 pinMode\cf6 \strokec6 (\cf4 \strokec4 enB\cf6 \strokec6 , OUTPUT);   \cb1 \
+\
+\cf8 \cb3 \strokec8   //initialise serial communication\cf6 \cb1 \strokec6 \
+\cb3   \cf10 \strokec10 Serial\cf6 \strokec6 .\cf9 \strokec9 begin\cf6 \strokec6 (\cf11 \strokec11 9600\cf6 \strokec6 );\cb1 \
+\cb3   \cf10 \strokec10 Serial\cf6 \strokec6 .\cf9 \strokec9 println\cf6 \strokec6 (\cf5 \strokec5 "Arduino Nano is Running"\cf6 \strokec6 );\cf8 \strokec8  //sanity check\cf6 \cb1 \strokec6 \
+\
+\cb3   \cf10 \strokec10 speedSetting\cf6 \strokec6  = \cf11 \strokec11 255\cf6 \strokec6 ;\cb1 \
+\cb3   \cf9 \strokec9 motors\cf6 \strokec6 (\cf10 \strokec10 speedSetting\cf6 \strokec6 , \cf10 \strokec10 speedSetting\cf6 \strokec6 );\cf8 \strokec8  //make a call to the "motors" function and provide it with a value for each of the 2 motors - can be different for each motor - using same value here for expedience\cf6 \cb1 \strokec6 \
+\cb3   \cf10 \strokec10 Serial\cf6 \strokec6 .\cf9 \strokec9 print\cf6 \strokec6 (\cf5 \strokec5 "Motor Speeds: "\cf6 \strokec6 );\cb1 \
+\cb3   \cf10 \strokec10 Serial\cf6 \strokec6 .\cf9 \strokec9 println\cf6 \strokec6 (\cf10 \strokec10 speedSetting\cf6 \strokec6 ); \cb1 \
+\cf8 \cb3 \strokec8   //to ensure the servo angle left is correct\cf6 \cb1 \strokec6 \
+\cb3   \cf10 \strokec10 myservo\cf6 \strokec6 .\cf9 \strokec9 write\cf6 \strokec6 (\cf11 \strokec11 0\cf6 \strokec6 );\cb1 \
+\cb3   \cf9 \strokec9 delay\cf6 \strokec6 (\cf11 \strokec11 1000\cf6 \strokec6 );\cb1 \
+\cb3   \cf10 \strokec10 myservo\cf6 \strokec6 .\cf9 \strokec9 write\cf6 \strokec6 (\cf11 \strokec11 80\cf6 \strokec6 );\cb1 \
+\cb3   \cf9 \strokec9 delay\cf6 \strokec6 (\cf11 \strokec11 1000\cf6 \strokec6 );\cb1 \
+\cb3   \cf10 \strokec10 myservo\cf6 \strokec6 .\cf9 \strokec9 write\cf6 \strokec6 (\cf11 \strokec11 180\cf6 \strokec6 );\cb1 \
+\cb3   \cf9 \strokec9 delay\cf6 \strokec6 (\cf11 \strokec11 1000\cf6 \strokec6 );\cb1 \
+\cb3   \cf10 \strokec10 myservo\cf6 \strokec6 .\cf9 \strokec9 write\cf6 \strokec6 (\cf11 \strokec11 80\cf6 \strokec6 );\cb1 \
+\
+\cf8 \cb3 \strokec8   //Wire.onRequest(requestEvent); //Prepare to send data\cf6 \cb1 \strokec6 \
+\cb3   \cf10 \strokec10 Wire\cf6 \strokec6 .\cf9 \strokec9 onReceive\cf6 \strokec6 (receiveEvent);\cf8 \strokec8  //Prepare to recieve data\cf6 \cb1 \strokec6 \
+\cb3   \cb1 \
+\cb3 \}\cb1 \
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf9 \strokec9 loop\cf6 \strokec6 () \{\cb1 \
+\
+\cb3   \cf9 \strokec9 goForwards\cf6 \strokec6 ();\cb1 \
+\cb3   \cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 error\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cb3   \cf9 \strokec9 receiveEvent\cf6 \strokec6 (\cf11 \strokec11 8\cf6 \strokec6 , &\cf10 \strokec10 error\cf6 \strokec6 );\cb1 \
+\cb3   \cf4 \strokec4 double\cf6 \strokec6  \cf10 \strokec10 PID\cf6 \strokec6  = (\cf10 \strokec10 Kp\cf6 \strokec6 *\cf10 \strokec10 error\cf6 \strokec6 )+(\cf10 \strokec10 Ki\cf6 \strokec6 *\cf10 \strokec10 cumulative_error\cf6 \strokec6 )+(\cf10 \strokec10 Kd\cf6 \strokec6 *(\cf10 \strokec10 error\cf6 \strokec6 -\cf10 \strokec10 prev_error\cf6 \strokec6 ));\cb1 \
+\cb3   \cf10 \strokec10 cumulative_error\cf6 \strokec6  += \cf10 \strokec10 error\cf6 \strokec6 ;\cb1 \
+\cb3   \cf10 \strokec10 prev_error\cf6 \strokec6  = \cf10 \strokec10 error\cf6 \strokec6 ;\cb1 \
+\cb3   \cf10 \strokec10 servoAngle\cf6 \strokec6  = \cf11 \strokec11 85\cf6 \strokec6  + \cf10 \strokec10 PID\cf6 \strokec6 ;\cb1 \
+\cb3   \cf10 \strokec10 leftMotor_speed\cf6 \strokec6  = \cf10 \strokec10 baseSpeed\cf6 \strokec6  + \cf10 \strokec10 K\cf6 \strokec6 *\cf10 \strokec10 PID\cf6 \strokec6 ;\cb1 \
+\cb3   \cf10 \strokec10 rightMotor_speed\cf6 \strokec6  = \cf10 \strokec10 baseSpeed\cf6 \strokec6  - \cf10 \strokec10 K\cf6 \strokec6 *\cf10 \strokec10 PID\cf6 \strokec6 ;\cb1 \
+\cb3 \}\cb1 \
+\
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf9 \strokec9 receiveEvent\cf6 \strokec6 (\cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 numBytes\cf6 \strokec6 , \cf4 \strokec4 int*\cf6 \strokec6  \cf10 \strokec10 error\cf6 \strokec6 )\{\cb1 \
+\cf8 \cb3 \strokec8   //Set Up Vars\cf6 \cb1 \strokec6 \
+\cb3   \cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 count\cf6 \strokec6 =\cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\
+\cf8 \cb3 \strokec8   //We'll receive one byte at a time. Stop when none left\cf6 \cb1 \strokec6 \
+\cb3   \cf2 \strokec2 while\cf6 \strokec6 (\cf10 \strokec10 Wire\cf6 \strokec6 .\cf9 \strokec9 available\cf6 \strokec6 ())\cb1 \
+\cb3   \{\cb1 \
+\cb3     \cf4 \strokec4 char\cf6 \strokec6  \cf10 \strokec10 c\cf6 \strokec6  = \cf10 \strokec10 Wire\cf6 \strokec6 .\cf9 \strokec9 read\cf6 \strokec6 ();\cf8 \strokec8     // receive a byte as character\cf6 \cb1 \strokec6 \
+\cb3     \cb1 \
+\cf8 \cb3 \strokec8     //Create Int from the Byte Array\cf6 \cb1 \strokec6 \
+\cb3     \cf2 \strokec2 if\cf6 \strokec6  (\cf10 \strokec10 numBytes\cf6 \strokec6  == \cf11 \strokec11 1\cf6 \strokec6 ) \{\cb1 \
+\cf8 \cb3 \strokec8       // If only one byte was received, assume it is signed\cf6 \cb1 \strokec6 \
+\cb3       \cf7 \strokec7 int8_t\cf6 \strokec6  \cf10 \strokec10 b\cf6 \strokec6  = \cf10 \strokec10 c\cf6 \strokec6 ;\cb1 \
+\cb3       *\cf10 \strokec10 error\cf6 \strokec6  = \cf10 \strokec10 b\cf6 \strokec6 ;\cb1 \
+\cb3     \} \cf2 \strokec2 else\cf6 \strokec6  \{\cb1 \
+\cf8 \cb3 \strokec8       // If more than one byte was received, use an unsigned data type to store the value\cf6 \cb1 \strokec6 \
+\cb3       \cf7 \strokec7 uint8_t\cf6 \strokec6  \cf10 \strokec10 b\cf6 \strokec6  = \cf10 \strokec10 c\cf6 \strokec6 ;\cb1 \
+\cb3       *\cf10 \strokec10 error\cf6 \strokec6  = \cf10 \strokec10 b\cf6 \strokec6  << (\cf11 \strokec11 8\cf6 \strokec6  * \cf10 \strokec10 count\cf6 \strokec6 ) | *\cf10 \strokec10 error\cf6 \strokec6 ;\cb1 \
+\cb3     \}\cb1 \
+\cb3     \cb1 \
+\cb3     \cf10 \strokec10 count\cf6 \strokec6 ++;\cb1 \
+\cb3   \}\cb1 \
+\
+\cf8 \cb3 \strokec8   //Print the Int out.\cf6 \cb1 \strokec6 \
+\cb3   \cf10 \strokec10 Serial\cf6 \strokec6 .\cf9 \strokec9 print\cf6 \strokec6 (\cf5 \strokec5 "Received Number: "\cf6 \strokec6 ); \cb1 \
+\cb3   \cf10 \strokec10 Serial\cf6 \strokec6 .\cf9 \strokec9 println\cf6 \strokec6 (*\cf10 \strokec10 error\cf6 \strokec6 );\cb1 \
+\cb3 \}\cb1 \
+\
+\cf8 \cb3 \strokec8 /*\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8 void loop() \{\cf6 \cb1 \strokec6 \
+\
+\cf8 \cb3 \strokec8   goForwards();\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   receiveEvent(16, &error);\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   double PID = (Kp*error)+(Ki*cumulative_error)+(Kd*(error-prev_error));\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   cumulative_error=cumulative_error+error;\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   prev_error = error;\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   servoAngle = 85 + PID;\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   leftMotor_speed = baseSpeed + K*PID;\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   rightMotor_speed = baseSpeed - K*PID;\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8 \}\cf6 \cb1 \strokec6 \
+\
+\cf8 \cb3 \strokec8 void receiveEvent(int numBytes)\{\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   //void receiveEvent(int numBytes, int* error)\{\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   //Set Up Vars\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   int receive_int=0;\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   int count=0;\cf6 \cb1 \strokec6 \
+\
+\cf8 \cb3 \strokec8   //We'll recieve one byte at a time. Stop when none left\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   while(Wire.available())\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   \{\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8     char c = Wire.read();    // receive a byte as character\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8     \cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8     //Create Int from the Byte Array\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8     if (numBytes == 1) \{\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8       // If only one byte was received, assume it is signed\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8       int8_t b = c;\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8       receive_int = b << (8 * count) | receive_int;\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8     \} else \{\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8       // If more than one byte was received, use an unsigned data type to store the value\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8       uint8_t b = c;\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8       receive_int = b << (8 * count) | receive_int;\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8     \}\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8     \cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8     count++;\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   \}\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   //*error = receive_int;\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   //Print the Int out.\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   Serial.print("Received Number: "); \cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   Serial.println(receive_int);\cf6 \cb1 \strokec6 \
+\
+\cf8 \cb3 \strokec8 \}\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8 */\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf9 \strokec9 motors\cf6 \strokec6 (\cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 leftSpeed\cf6 \strokec6 , \cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 rightSpeed\cf6 \strokec6 ) \{\cb1 \
+\cf8 \cb3 \strokec8   //set individual motor speed\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8   //direction is set separately\cf6 \cb1 \strokec6 \
+\
+\cb3   \cf9 \strokec9 analogWrite\cf6 \strokec6 (\cf4 \strokec4 enA\cf6 \strokec6 , \cf10 \strokec10 leftSpeed\cf6 \strokec6 );\cb1 \
+\cb3   \cf9 \strokec9 analogWrite\cf6 \strokec6 (\cf4 \strokec4 enB\cf6 \strokec6 , \cf10 \strokec10 rightSpeed\cf6 \strokec6 );\cb1 \
+\cb3 \}\cb1 \
+\
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf9 \strokec9 moveSteering\cf6 \strokec6 () \{\cb1 \
+\cf8 \cb3 \strokec8   //you may need to change the maximum and minimum servo angle to have the largest steering motion\cf6 \cb1 \strokec6 \
+\cb3   \cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 maxAngle\cf6 \strokec6  = \cf11 \strokec11 180\cf6 \strokec6 ;\cb1 \
+\cb3   \cf4 \strokec4 int\cf6 \strokec6  \cf10 \strokec10 minAngle\cf6 \strokec6  = \cf11 \strokec11 0\cf6 \strokec6 ;\cb1 \
+\cb3   \cf10 \strokec10 myservo\cf6 \strokec6 .\cf9 \strokec9 write\cf6 \strokec6 (\cf11 \strokec11 0\cf6 \strokec6 );\cb1 \
+\cb3   \cf2 \strokec2 for\cf6 \strokec6  (\cf10 \strokec10 steeringAngle\cf6 \strokec6  = \cf10 \strokec10 minAngle\cf6 \strokec6 ; \cf10 \strokec10 steeringAngle\cf6 \strokec6  <= \cf10 \strokec10 maxAngle\cf6 \strokec6 ; \cf10 \strokec10 steeringAngle\cf6 \strokec6  += \cf11 \strokec11 1\cf6 \strokec6 ) \{\cf8 \strokec8  //goes from minAngle to maxAngle (degrees)\cf6 \cb1 \strokec6 \
+\cf8 \cb3 \strokec8     //in steps of 1 degree\cf6 \cb1 \strokec6 \
+\cb3     \cf10 \strokec10 myservo\cf6 \strokec6 .\cf9 \strokec9 write\cf6 \strokec6 (\cf10 \strokec10 steeringAngle\cf6 \strokec6 );\cf8 \strokec8    //tell servo to go to position in variable 'steeringAngle'\cf6 \cb1 \strokec6 \
+\cb3     \cf9 \strokec9 delay\cf6 \strokec6 (\cf11 \strokec11 15\cf6 \strokec6 );\cf8 \strokec8                       //waits 15ms for the servo to reach the position\cf6 \cb1 \strokec6 \
+\cb3   \}\cb1 \
+\cb3   \cf2 \strokec2 for\cf6 \strokec6  (\cf10 \strokec10 steeringAngle\cf6 \strokec6  = \cf10 \strokec10 maxAngle\cf6 \strokec6 ; \cf10 \strokec10 steeringAngle\cf6 \strokec6  >= \cf10 \strokec10 minAngle\cf6 \strokec6 ; \cf10 \strokec10 steeringAngle\cf6 \strokec6  -= \cf11 \strokec11 1\cf6 \strokec6 ) \{\cf8 \strokec8  // goes from maxAngle to minAngle (degrees)\cf6 \cb1 \strokec6 \
+\cb3     \cf10 \strokec10 myservo\cf6 \strokec6 .\cf9 \strokec9 write\cf6 \strokec6 (\cf10 \strokec10 steeringAngle\cf6 \strokec6 );\cf8 \strokec8    //tell servo to go to position in variable 'steeringAngle'\cf6 \cb1 \strokec6 \
+\cb3     \cf9 \strokec9 delay\cf6 \strokec6 (\cf11 \strokec11 15\cf6 \strokec6 );\cf8 \strokec8                       //waits 15 ms for the servo to reach the position\cf6 \cb1 \strokec6 \
+\cb3   \}\cb1 \
+\cb3 \}\cb1 \
+\
+\
+\cf8 \cb3 \strokec8 //for each of the below function, two of the 'IN' variables must be HIGH, and two LOW in order to move the wheels - use a trial and error approach to determine the correct combination for your EEEBot\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf9 \strokec9 goForwards\cf6 \strokec6 () \{\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INa\cf6 \strokec6 , HIGH);\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INb\cf6 \strokec6 , LOW);\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INc\cf6 \strokec6 , HIGH);\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INd\cf6 \strokec6 , LOW);\cb1 \
+\cb3 \}\cb1 \
+\
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf9 \strokec9 goBackwards\cf6 \strokec6 () \{\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INa\cf6 \strokec6 , LOW);\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INb\cf6 \strokec6 , HIGH);\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INc\cf6 \strokec6 , LOW);\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INd\cf6 \strokec6 , HIGH);\cb1 \
+\cb3 \}\cb1 \
+\
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf9 \strokec9 goClockwise\cf6 \strokec6 () \{\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INa\cf6 \strokec6 , HIGH);\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INb\cf6 \strokec6 , LOW);\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INc\cf6 \strokec6 , LOW);\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INd\cf6 \strokec6 , HIGH);\cb1 \
+\cb3 \}\cb1 \
+\
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf9 \strokec9 goAntiClockwise\cf6 \strokec6 () \{\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INa\cf6 \strokec6 , LOW);\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INb\cf6 \strokec6 , HIGH);\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INc\cf6 \strokec6 , HIGH);\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INd\cf6 \strokec6 , LOW);\cb1 \
+\cb3 \}\cb1 \
+\
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf9 \strokec9 stopMotors\cf6 \strokec6 () \{\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INa\cf6 \strokec6 , LOW);\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INb\cf6 \strokec6 , LOW);\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INc\cf6 \strokec6 , LOW);\cb1 \
+\cb3   \cf9 \strokec9 digitalWrite\cf6 \strokec6 (\cf4 \strokec4 INd\cf6 \strokec6 , LOW);\cb1 \
+\cb3 \}\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \
+}
